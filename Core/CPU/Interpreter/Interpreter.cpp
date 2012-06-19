@@ -4,8 +4,23 @@ void Interpreter::Run() {
 	while(true) {
 		uint8_t *eip = (uint8_t *) MemoryBase + Eip;
 		// Prefixes
-		switch(*eip) {
-		}
+		bool foundPrefix = true;
+		bool opsize = false, adsize = false;
+		while(foundPrefix)
+			switch(*eip++) {
+				case 0x66: {// OPSIZE
+					opsize = true;
+					break;
+				}
+				case 0x67: {// ADSIZE
+					adsize = true;
+					break;
+				}
+				default: {
+					foundPrefix = false;
+					eip--;
+				}
+			}
 
 		uint8_t op = *eip++;
 		Eip++;
@@ -13,9 +28,14 @@ void Interpreter::Run() {
 		// Instructions
 		switch(op) {
 			case 0x05: {// ADD rAX, Iz
-				uint32_t val = *(uint32_t *) eip;
-				eip += 4;
-				// XXX: Add 16-bit check.
+				int32_t val;
+				if(opsize) { // 16-bit
+					val = *(int16_t *) eip;
+					eip += 2;
+				} else {
+					val = *(int32_t *) eip;
+					eip += 4;
+				}
 				Eax += val;
 				printf("%08x\n", Eax);
 				break;
