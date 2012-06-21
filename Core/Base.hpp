@@ -3,6 +3,6 @@
 
 #define null NULL
 
-#define WARN(msg) { printf("%s\n", msg); }
-#define ASSERT(comp, msg) { if(!(comp)) { printf("%s\n", msg); exit(1); } }
-#define BAIL(msg) { printf("%s\n", msg); exit(1); }
+#define WARN(msg) { printf("Warning: %s\n", msg); }
+#define ASSERT(comp, msg) { if(!(comp)) { printf("Assertion failed: %s\n", msg); exit(1); } }
+#define BAIL(msg) { printf("Bailing: %s\n", msg); exit(1); }
