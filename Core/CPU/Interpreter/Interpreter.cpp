@@ -1,4 +1,5 @@
 #include "Interpreter.hpp"
+#include "Instructions.hpp"
 
 void Interpreter::Run() {
 	while(true) {
@@ -25,25 +26,10 @@ void Interpreter::Run() {
 		uint8_t op = *eip++;
 		Eip++;
 		printf("Op %02x\n", op);
+		printf("Eax %08x\n", Eax);
 		// Instructions
 		switch(op) {
-			case 0x05: {// ADD rAX, Iz
-				int32_t val;
-				if(opsize) { // 16-bit
-					val = *(int16_t *) eip;
-					eip += 2;
-				} else {
-					val = *(int32_t *) eip;
-					eip += 4;
-				}
-				Eax += val;
-				printf("%08x\n", Eax);
-				break;
-			}
-			case 0xEB: {// JMP Ib
-				eip += (int8_t) *eip++;
-				break;
-			}
+#include "Interpreter_inst.cgen"
 			default: {
 				printf("Undefined opcode %02x @ %08X\n", op, Eip);
 				exit(1);
@@ -51,4 +37,33 @@ void Interpreter::Run() {
 		}
 		Eip = (uint32_t) (eip - (uint8_t *) MemoryBase);
 	}
+}
+
+void *Interpreter::RmAddr(uint8_t mod, uint8_t rm, int size) {
+	return null;
+}
+
+void *Interpreter::Reg(int reg, int size) {
+	uint32_t *regaddr;
+	size_t off = 0;
+	if(reg > 4 && size == 1) {
+		reg -= 4;
+		off = 1;
+	}
+	switch(reg) {
+		case 0: regaddr = &Eax; break;
+		case 1: regaddr = &Ecx; break;
+		case 2: regaddr = &Edx; break;
+		case 3: regaddr = &Ebx; break;
+		case 4: regaddr = &Esp; break;
+		case 5: regaddr = &Ebp; break;
+		case 6: regaddr = &Esi; break;
+		case 7: regaddr = &Edi; break;
+	}
+
+	return ((uint8_t *) regaddr) + off;
+}
+
+uint16_t *Interpreter::SegReg(int reg) {
+	return null;
 }
