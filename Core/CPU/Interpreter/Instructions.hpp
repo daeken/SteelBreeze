@@ -1,14 +1,48 @@
+// Arithmetic
 #define INSN_ADD(a, b) { a = a + b; }
 #define INSN_SUB(a, b) { a = a - b; }
+#define INSN_AND(a, b) { a = a & b; }
+#define INSN_OR( a, b) { a = a | b; }
+#define INSN_XOR(a, b) { a = a ^ b; }
+#define INSN_DEC(a)    { a--; }
+#define INSN_INC(a)    { a++; }
 
-#define INSN_JMP(a) { eip += a; }
+// Branches
+#define INSN_JMP( a) { eip += a; }
+#define COND(a, cmp) { if(cmp) eip += a; }
+#define INSN_JZ(  a) COND(a, ZF)
+#define INSN_JNZ( a) COND(a, !ZF)
+#define INSN_JB(  a) COND(a, CF)
+#define INSN_JNB( a) COND(a, !CF)
+#define INSN_JBE( a) COND(a, CF || ZF)
+#define INSN_JNBE(a) COND(a, !CF && !ZF)
+#define INSN_JL(  a) COND(a, SF != OF)
+#define INSN_JLE( a) COND(a, ZF || SF != OF)
+#define INSN_JNL( a) COND(a, SF == OF)
+#define INSN_JNLE(a) COND(a, !ZF && SF == OF)
+#define INSN_JO(  a) COND(a, OF)
+#define INSN_JNO( a) COND(a, !OF)
+#define INSN_JP(  a) COND(a, PF)
+#define INSN_JNP( a) COND(a, !PF)
+#define INSN_JS(  a) COND(a, SF)
+#define INSN_JNS( a) COND(a, !SF)
+#define INSN_JCXZ(a) COND(a, !Ecx)
 
+// Moves
+#define INSN_MOV( a, b) { a = b; }
+#define INSN_XCHG(a, b) { typeof(a) _temp = a; a = b; b = _temp; }
+
+// Misc
+#define INSN_NOP() { }
+#define INSN_HLT() { BAIL("HLT executed"); }
+
+
+// Stubs
 #define INSN_AAA() { BAIL("STUB Instruction AAA"); }
 #define INSN_AAD(a) { BAIL("STUB Instruction AAD"); }
 #define INSN_AAM(a) { BAIL("STUB Instruction AAM"); }
 #define INSN_AAS() { BAIL("STUB Instruction AAS"); }
 #define INSN_ADC(a, b) { BAIL("STUB Instruction ADC"); }
-#define INSN_AND(a, b) { BAIL("STUB Instruction AND"); }
 #define INSN_ARPL(a, b) { BAIL("STUB Instruction ARPL"); }
 #define INSN_BOUND(a, b) { BAIL("STUB Instruction BOUND"); }
 #define INSN_CALL(a) { BAIL("STUB Instruction CALL"); }
@@ -22,35 +56,15 @@
 #define INSN_CWDE() { BAIL("STUB Instruction CWDE"); }
 #define INSN_DAA() { BAIL("STUB Instruction DAA"); }
 #define INSN_DAS() { BAIL("STUB Instruction DAS"); }
-#define INSN_DEC(a) { BAIL("STUB Instruction DEC"); }
 #define INSN_ENTER(a, b) { BAIL("STUB Instruction ENTER"); }
-#define INSN_HLT() { BAIL("STUB Instruction HLT"); }
 #define INSN_IMUL(a, b, c) { BAIL("STUB Instruction IMUL"); }
 #define INSN_IN(a, b) { BAIL("STUB Instruction IN"); }
-#define INSN_INC(a) { BAIL("STUB Instruction INC"); }
 #define INSN_INS(a, b) { BAIL("STUB Instruction INS"); }
 #define INSN_INT(a) { BAIL("STUB Instruction INT"); }
 #define INSN_INT1() { BAIL("STUB Instruction INT1"); }
 #define INSN_INT3() { BAIL("STUB Instruction INT3"); }
 #define INSN_INTO() { BAIL("STUB Instruction INTO"); }
 #define INSN_IRET() { BAIL("STUB Instruction IRET"); }
-#define INSN_JB(a) { BAIL("STUB Instruction JB"); }
-#define INSN_JBE(a) { BAIL("STUB Instruction JBE"); }
-#define INSN_JCXZ(a) { BAIL("STUB Instruction JCXZ"); }
-#define INSN_JL(a) { BAIL("STUB Instruction JL"); }
-#define INSN_JLE(a) { BAIL("STUB Instruction JLE"); }
-#define INSN_JNB(a) { BAIL("STUB Instruction JNB"); }
-#define INSN_JNBE(a) { BAIL("STUB Instruction JNBE"); }
-#define INSN_JNL(a) { BAIL("STUB Instruction JNL"); }
-#define INSN_JNLE(a) { BAIL("STUB Instruction JNLE"); }
-#define INSN_JNO(a) { BAIL("STUB Instruction JNO"); }
-#define INSN_JNP(a) { BAIL("STUB Instruction JNP"); }
-#define INSN_JNS(a) { BAIL("STUB Instruction JNS"); }
-#define INSN_JNZ(a) { BAIL("STUB Instruction JNZ"); }
-#define INSN_JO(a) { BAIL("STUB Instruction JO"); }
-#define INSN_JP(a) { BAIL("STUB Instruction JP"); }
-#define INSN_JS(a) { BAIL("STUB Instruction JS"); }
-#define INSN_JZ(a) { BAIL("STUB Instruction JZ"); }
 #define INSN_LAHF() { BAIL("STUB Instruction LAHF"); }
 #define INSN_LDS(a, b) { BAIL("STUB Instruction LDS"); }
 #define INSN_LEA(a, b) { BAIL("STUB Instruction LEA"); }
@@ -60,10 +74,7 @@
 #define INSN_LOOP(a) { BAIL("STUB Instruction LOOP"); }
 #define INSN_LOOPNZ(a) { BAIL("STUB Instruction LOOPNZ"); }
 #define INSN_LOOPZ(a) { BAIL("STUB Instruction LOOPZ"); }
-#define INSN_MOV(a, b) { BAIL("STUB Instruction MOV"); }
 #define INSN_MOVS(a, b) { BAIL("STUB Instruction MOVS"); }
-#define INSN_NOP() { BAIL("STUB Instruction NOP"); }
-#define INSN_OR(a, b) { BAIL("STUB Instruction OR"); }
 #define INSN_OUT(a, b) { BAIL("STUB Instruction OUT"); }
 #define INSN_OUTS(a, b) { BAIL("STUB Instruction OUTS"); }
 #define INSN_POP(a) { BAIL("STUB Instruction POP"); }
@@ -86,6 +97,4 @@
 #define INSN_STOS(a, b) { BAIL("STUB Instruction STOS"); }
 #define INSN_TEST(a, b) { BAIL("STUB Instruction TEST"); }
 #define INSN_WAIT() { BAIL("STUB Instruction WAIT"); }
-#define INSN_XCHG(a, b) { BAIL("STUB Instruction XCHG"); }
 #define INSN_XLAT() { BAIL("STUB Instruction XLAT"); }
-#define INSN_XOR(a, b) { BAIL("STUB Instruction XOR"); }
